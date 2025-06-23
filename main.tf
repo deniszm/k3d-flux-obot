@@ -20,10 +20,11 @@ module "k3d_cluster" {
 }
 
 module "flux_bootstrap" {
+  depends_on        = [module.k3d_cluster]
   source            = "github.com/deniszm/tf-fluxcd-flux-bootstrap"
   github_repository = "${var.github_owner}/${var.flux_github_repo}"
   private_key       = module.tls_private_key.private_key_pem
-  config_path       = module.k3d_cluster.kubeconfig_raw
+  config_path       = var.config_path
   github_token      = var.github_token
 }
 

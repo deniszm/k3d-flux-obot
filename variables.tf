@@ -35,3 +35,9 @@ variable "k3d_agent_count" {
   type        = number
   description = "Number of K3D agent nodes"
 }
+
+variable "config_path" {
+  type        = string
+  default     = "~/.kube/config"
+  description = "The path to the kubeconfig file"
+}
