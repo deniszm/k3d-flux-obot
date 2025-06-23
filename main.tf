@@ -34,21 +34,18 @@ resource "github_repository_file" "obot_gitrepository" {
   repository = var.flux_github_repo
   branch     = "main"
   file       = "clusters/local/obot-gitrepository.yaml"
-  content = yamlencode({
-    apiVersion = "source.toolkit.fluxcd.io/v1beta2"
-    kind       = "GitRepository"
-    metadata = {
-      name      = "obot"
-      namespace = "flux-system"
-    }
-    spec = {
-      interval = "1m"
-      url      = "https://github.com/deniszm/obot"
-      ref = {
-        branch = "main"
-      }
-    }
-  })
+  content = <<-EOT
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: obot
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/deniszm/obot
+  ref:
+    branch: main
+EOT
   commit_message      = "Add obot GitRepository"
   commit_author       = var.github_owner
   commit_email        = "${var.github_owner}@users.noreply.github.com"
@@ -62,36 +59,23 @@ resource "github_repository_file" "obot_helmrelease" {
   repository = var.flux_github_repo
   branch     = "main"
   file       = "clusters/local/obot-helmrelease.yaml"
-  content = yamlencode({
-    apiVersion = "helm.toolkit.fluxcd.io/v2beta1"
-    kind       = "HelmRelease"
-    metadata = {
-      name      = "obot"
-      namespace = "default"
-    }
-    spec = {
-      interval = "1m"
-      sourceRef = {
-        kind      = "GitRepository"
-        name      = "obot"
-        namespace = "flux-system"
-      }
-      chart = {
-        spec = {
-          chart   = "helm"
-          version = "*"
-          sourceRef = {
-            kind      = "GitRepository"
-            name      = "obot"
-            namespace = "flux-system"
-          }
-        }
-      }
-      # values = {
-      #   # Custom values for Helm chart can be added later
-      # }
-    }
-  })
+  content = <<-EOT
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: obot
+  namespace: default
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: helm
+      version: "*"
+      sourceRef:
+        kind: GitRepository
+        name: obot
+        namespace: flux-system
+EOT
   commit_message      = "Add obot HelmRelease"
   commit_author       = var.github_owner
   commit_email        = "${var.github_owner}@users.noreply.github.com"
