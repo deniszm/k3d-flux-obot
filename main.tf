@@ -26,3 +26,74 @@ module "flux_bootstrap" {
   config_path       = module.k3d_cluster.kubeconfig_raw
   github_token      = var.github_token
 }
+
+# Create GitRepository manifest for obot in flux-gitops repo
+resource "github_repository_file" "obot_gitrepository" {
+  depends_on = [module.flux_bootstrap]
+  
+  repository          = var.flux_github_repo
+  branch              = "main"
+  file                = "clusters/local/obot-gitrepository.yaml"
+  content             = yamlencode({
+    apiVersion = "source.toolkit.fluxcd.io/v1beta2"
+    kind       = "GitRepository"
+    metadata = {
+      name      = "obot"
+      namespace = "flux-system"
+    }
+    spec = {
+      interval = "1m"
+      url      = "https://github.com/deniszm/obot"
+      ref = {
+        branch = "main"
+      }
+    }
+  })
+  commit_message      = "Add obot GitRepository"
+  commit_author       = var.github_owner
+  commit_email        = "${var.github_owner}@users.noreply.github.com"
+  overwrite_on_create = true
+}
+
+# Create HelmRelease manifest for obot in flux-gitops repo
+resource "github_repository_file" "obot_helmrelease" {
+  depends_on = [github_repository_file.obot_gitrepository]
+  
+  repository          = var.flux_github_repo
+  branch              = "main"
+  file                = "clusters/local/obot-helmrelease.yaml"
+  content             = yamlencode({
+    apiVersion = "helm.toolkit.fluxcd.io/v2beta1"
+    kind       = "HelmRelease"
+    metadata = {
+      name      = "obot"
+      namespace = "default"
+    }
+    spec = {
+      interval = "1m"
+      sourceRef = {
+        kind      = "GitRepository"
+        name      = "obot"
+        namespace = "flux-system"
+      }
+      chart = {
+        spec = {
+          chart = "helm"
+          version = "*"
+          sourceRef = {
+            kind      = "GitRepository"
+            name      = "obot"
+            namespace = "flux-system"
+          }
+        }
+      }
+      # values = {
+      #   # Custom values for Helm chart can be added later
+      # }
+    }
+  })
+  commit_message      = "Add obot HelmRelease"
+  commit_author       = var.github_owner
+  commit_email        = "${var.github_owner}@users.noreply.github.com"
+  overwrite_on_create = true
+}
