@@ -98,11 +98,17 @@ Flux (1m) ←──────────────────────�
    terraform apply
    ```
 
-4. **Verify deployment**
+4. **Create Telegram Bot Secret**
    ```bash
-   # Get kubeconfig
-   k3d kubeconfig get flux-obot
+   # Create secret with your Telegram bot token
+   kubectl create secret generic obot --from-literal=token=YOUR_TELEGRAM_BOT_TOKEN
+   ```
    
+   > **Note**: Replace `YOUR_TELEGRAM_BOT_TOKEN` with your actual Telegram Bot token.
+   > You can get a bot token by messaging [@BotFather](https://t.me/botfather) on Telegram.
+
+5. **Verify deployment**
+   ```bash
    # Check Flux controllers
    kubectl get pods -n flux-system
    
@@ -142,6 +148,8 @@ Flux (1m) ←──────────────────────�
 - GitRepository CRD pointing to `https://github.com/deniszm/obot`
 - HelmRelease CRD deploying obot from `helm/` directory
 - obot application running in `default` namespace
+
+> **Important**: The obot application requires a Kubernetes secret named `obot` with a `token` key containing your Telegram Bot token. This secret must be created manually after the infrastructure deployment.
 
 ### Generated Files
 The following files are automatically created in your flux-gitops repository:
@@ -198,6 +206,18 @@ kubectl describe helmrelease obot
 kubectl logs -n flux-system deployment/helm-controller
 ```
 
+### obot Pod failing with CreateContainerConfigError
+```bash
+# Check if obot secret exists
+kubectl get secret obot
+
+# If secret doesn't exist, create it
+kubectl create secret generic obot --from-literal=token=YOUR_TELEGRAM_BOT_TOKEN
+
+# Check pod logs after secret creation
+kubectl logs -l app=obot
+```
+
 ### GitHub authentication issues
 ```bash
 # Check if deploy key is added to repository
@@ -232,7 +252,3 @@ k3d cluster delete flux-obot
 - [tf-github-repository](https://github.com/deniszm/tf-github-repository) - GitHub repo setup
 - [tf-k3d-cluster](https://github.com/deniszm/tf-k3d-cluster) - K3D cluster creation
 - [tf-fluxcd-flux-bootstrap](https://github.com/deniszm/tf-fluxcd-flux-bootstrap) - Flux installation
-
-## License
-
-This project is licensed under the MIT License.
