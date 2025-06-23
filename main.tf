@@ -30,11 +30,11 @@ module "flux_bootstrap" {
 # Create GitRepository manifest for obot in flux-gitops repo
 resource "github_repository_file" "obot_gitrepository" {
   depends_on = [module.flux_bootstrap]
-  
-  repository          = var.flux_github_repo
-  branch              = "main"
-  file                = "clusters/local/obot-gitrepository.yaml"
-  content             = yamlencode({
+
+  repository = var.flux_github_repo
+  branch     = "main"
+  file       = "clusters/local/obot-gitrepository.yaml"
+  content = yamlencode({
     apiVersion = "source.toolkit.fluxcd.io/v1beta2"
     kind       = "GitRepository"
     metadata = {
@@ -58,11 +58,11 @@ resource "github_repository_file" "obot_gitrepository" {
 # Create HelmRelease manifest for obot in flux-gitops repo
 resource "github_repository_file" "obot_helmrelease" {
   depends_on = [github_repository_file.obot_gitrepository]
-  
-  repository          = var.flux_github_repo
-  branch              = "main"
-  file                = "clusters/local/obot-helmrelease.yaml"
-  content             = yamlencode({
+
+  repository = var.flux_github_repo
+  branch     = "main"
+  file       = "clusters/local/obot-helmrelease.yaml"
+  content = yamlencode({
     apiVersion = "helm.toolkit.fluxcd.io/v2beta1"
     kind       = "HelmRelease"
     metadata = {
@@ -78,7 +78,7 @@ resource "github_repository_file" "obot_helmrelease" {
       }
       chart = {
         spec = {
-          chart = "helm"
+          chart   = "helm"
           version = "*"
           sourceRef = {
             kind      = "GitRepository"

@@ -3,12 +3,12 @@ k3d_cluster_name = "flux-obot"
 k3d_agent_count  = 3
 
 # GitHub Configuration
-github_owner     = "your-github-username"
-github_token     = "your-github-personal-access-token"
+github_owner = "your-github-username"
+github_token = "your-github-personal-access-token"
 
 # Optional: Flux Repository Name (defaults to flux-gitops)
 # flux_github_repo = "flux-gitops"
 
 # Optional: TLS Configuration (defaults shown)
-# tls_algorithm = "ECDSA"
+# tls_algorithm   = "ECDSA"
 # tls_ecdsa_curve = "P256"
